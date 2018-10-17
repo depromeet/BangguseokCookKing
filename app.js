@@ -6,7 +6,7 @@ const logger = require('./app/helpers/logHandler');
 const errorHandle = require('./app/helpers/errors/errorHandle');
 
 const indexRouter = require('./app/routes/index');
-const usersRouter = require('./app/routes/userRouter');
+const RecipeRouter = require('./app/routes/RecipeRouter');
 
 const app = express();
 
@@ -14,10 +14,8 @@ const app = express();
 app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'ejs');
 
-
-// mongoDB setup
-const mongoHandler = require('./app/helpers/mongooseHandler');
-mongoHandler.connect();
+// Fawn with mongoose setup
+const Fawn = require('./app/helpers/fawnHandler');
 
 // app use setup
 app.use(express.json());
@@ -26,7 +24,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use(usersRouter);
+app.use('/recipe', RecipeRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
