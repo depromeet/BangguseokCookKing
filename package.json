@@ -13,6 +13,7 @@
     "ejs": "~2.5.7",
     "express": "~4.16.0",
     "express-async-wrap": "^1.0.0",
+    "fawn": "^2.1.5",
     "http-errors": "~1.6.2",
     "mongoose": "^5.2.9",
     "winston": "^3.0.0"
