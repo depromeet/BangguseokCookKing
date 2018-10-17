@@ -25,6 +25,7 @@ const recipeSchema = mongoClient.Schema({
 	},
 	subRecipeList: [{       // 상세 레시피 객체 리스트
 		type: mongoClient.Schema.ObjectId,
+		ref: "SubRecipe",
 		minItems: 0,
 		maxItems: 6,
 	}]
@@ -56,7 +57,7 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 
 		let [err, taskDone] = await to(Task.save('Recipe', recipeDoc).run({useMongoose: true}));
 		if(err) {
-			logger.error(err); reject(err);
+			logger.error(err); err.myMessage = "레시피 등록에 실패했습니다."; reject(err);
 		} else {
 			resolve(taskDone);
 		}
@@ -67,8 +68,9 @@ recipeSchema.statics.removeRecipeCascade = function (recipeId) {
 	// TODO: 이미지 파일 삭제도 같이 해야한다.
 	return new Promise(async function(resolve, reject) {
 		let [err, recipeDoc] = await to(this.findById(recipeId).exec());
-		if(err)
-			reject(err);
+		if(err) {
+			err.myMessage= "레시피 삭제에 오류가 발생했습니다."; reject(err);
+		}
 		if(recipeDoc === null)
 			reject(new ClientError("레시피가 이미 존재하지 않습니다.", 400, Date.now()));
 
@@ -83,5 +85,25 @@ recipeSchema.statics.removeRecipeCascade = function (recipeId) {
 	}.bind(this))
 };
 
+
+recipeSchema.statics.getOneRecipeById = function(recipeId) {
+	return new Promise(async function(resolve, reject) {
+		let [err, recipeDoc] = await to(this.findById(recipeId)
+			.populate({
+				path: 'subRecipeList',
+				select: 'order thumbnail comment',
+				options: {
+					sort: { order: 1}
+				}
+			}).exec());
+		if(err) {
+			err.myMessage = "레시피를 찾는 데 오류가 발생했습니다."; reject(err);
+		}
+		if(recipeDoc === null)
+			reject(new ClientError("레시피를 찾을 수 없습니다.", 400, Date.now()));
+
+		resolve(recipeDoc);
+	}.bind(this));
+};
 
 module.exports = mongoClient.model('Recipe', recipeSchema);

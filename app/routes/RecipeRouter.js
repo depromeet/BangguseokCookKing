@@ -9,4 +9,6 @@ router.post('/', wrap(RecipeCtrl.createRecipeHandler));
 /* 레시피 삭제 API */
 router.delete('/:recipeId', wrap(RecipeCtrl.removeRecipeHandler));
 
+router.get('/:recipeId', wrap(RecipeCtrl.getOneRecipeHandler));
+
 module.exports = router;
