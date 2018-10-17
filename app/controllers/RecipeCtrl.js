@@ -24,13 +24,30 @@ exports.createRecipeHandler = async(req, res, next) => {
 
 	let [err, recipeDoc] = await to(RecipeSchema.createRecipe(recipeData));
 	if(err) {
-		err.message = "회원가입을 실패하였습니다."; throw err;
+		err.message = "레시피 등록에 실패하였습니다."; throw err;
 	}
 
 	res.json({
 		"success": true,
 		"code": 200,
-		"message": "업로드 완료",
+		"message": "레시피 등록 완료",
 		"time": new Date()
 	})
 };
+
+exports.removeRecipeHandler = async function(req, res, next) {
+	let recipeId = req.params.recipeId;
+
+	let [err, recipeDoc] = await to(RecipeSchema.removeRecipeCascade(recipeId));
+	debugger;
+	if(err) {
+		err.message = "레시피 삭제 시 오류가 발생했습니다."; throw err;
+	}
+
+	res.json({
+		"success": true,
+		"code": 200,
+		"message": "레시피 삭제 완료",
+		"time": new Date()
+	})
+}

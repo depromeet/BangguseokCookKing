@@ -3,6 +3,8 @@
 const mongoClient = require('mongoose');
 const subRecipeSchema = require('./subRecipeSchema');
 const to = require('await-to-js').default;
+// error
+const ClientError = require('../helpers/errors/ClientError');
 
 const recipeSchema = mongoClient.Schema({
 	title: {                // 요리 제목
@@ -28,7 +30,6 @@ const recipeSchema = mongoClient.Schema({
 	}]
 });
 
-
 recipeSchema.statics.createRecipe = function(recipeObj) {
 	return new Promise(async function(resolve, reject) {
 		let Task = require('../helpers/fawnHandler').Task();
@@ -53,7 +54,6 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 			subRecipeList: subRecipeList
 		});
 
-		debugger;
 		let [err, taskDone] = await to(Task.save('Recipe', recipeDoc).run({useMongoose: true}));
 		if(err) {
 			logger.error(err); reject(err);
@@ -63,6 +63,25 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 	}.bind(this))
 };
 
+recipeSchema.statics.removeRecipeCascade = function (recipeId) {
+	// TODO: 이미지 파일 삭제도 같이 해야한다.
+	return new Promise(async function(resolve, reject) {
+		let [err, recipeDoc] = await to(this.findById(recipeId).exec());
+		if(err)
+			reject(err);
+		if(recipeDoc === null)
+			reject(new ClientError("레시피가 이미 존재하지 않습니다.", 400, Date.now()));
+
+		// Recipe에 연관된 subRecipe 삭제
+		for(let i = 0; i < recipeDoc.subRecipeList.length; i++) {
+			let subRecipeId = recipeDoc.subRecipeList[i].toString();
+			await subRecipeSchema.findByIdAndRemove(subRecipeId);
+		}
+
+		await recipeDoc.remove();
+		resolve();
+	}.bind(this))
+};
 
 
 module.exports = mongoClient.model('Recipe', recipeSchema);
