@@ -43,6 +43,7 @@ process.on('SIGINT', function() {
 // add schema
 //require('../models/member');
 
+mongoClient.myConnect = connect;
 
 //exports module function
-exports.connect = connect;
+module.exports = mongoClient;

@@ -7,9 +7,12 @@ const {printf} = winston.format;
 // 로그 출력 포맷 지정
 const myFormat = printf(info => {
 	let time;
-	if (process.env.NODE_ENV === 'dev')
+	if (process.env.NODE_ENV === 'dev') {}
 		time = chalk.grey(info.timestamp);
-	return `${time}--${info.level}: ${info.message}`
+	if(info.errors)
+		return `${time}--${info.level}: ${info.message} ${JSON.stringify(info.errors)}`;
+	else
+		return `${time}--${info.level}: ${info.message}`
 });
 // winston NODE_ENV에 따른 다른 로그 출력 설정
 /*
@@ -38,7 +41,7 @@ global.logger = winston.createLogger({
 			level: 'debug',
 			timestamp: true,
 			showLevel: true,
-			json: false,
+			json: true,
 			colorize: true
 		})
 	],
