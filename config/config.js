@@ -12,7 +12,7 @@ const config = {};
 
 if(process.env.NODE_ENV === "dev") {
 	config.mongodb = {
-		"DATABASE": 'myExpressGenerator',
+		"DATABASE": 'Bangguseok',
 		"PORT": '27017',
 		"HOST": 'localhost'
 	};
@@ -21,7 +21,7 @@ if(process.env.NODE_ENV === "dev") {
 	}
 } else if(process.env.NODE_ENV === "prod") {
 	config.mongodb = {
-		"DATABASE": 'myExpressGenerator',
+		"DATABASE": 'Bangguseok',
 		"PORT": '27017',
 		"HOST": 'localhost'
 	};
