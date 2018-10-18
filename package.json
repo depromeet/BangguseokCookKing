@@ -16,6 +16,7 @@
     "fawn": "^2.1.5",
     "http-errors": "~1.6.2",
     "mongoose": "^5.2.9",
+    "multer": "^1.4.1",
     "winston": "^3.0.0"
   }
 }

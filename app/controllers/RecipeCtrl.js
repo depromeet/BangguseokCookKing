@@ -5,12 +5,10 @@ const to = require('await-to-js').default;
 
 exports.createRecipeHandler = async(req, res, next) => {
 	// TODO: 데이터 형식 정해야함
-	// TODO: 사진 업로드 해야함
-
 	let recipeData = {
 		title: "계란찜",
 		ingredientList: ["계란 3알", "물 반컵"],
-		thumbnail: "/testUrl",
+		thumbnail: req.files.recipe[0].path.substr(6),
 		subRecipeList: [{
 			order: 1,
 			thumbnail: "/test1",
