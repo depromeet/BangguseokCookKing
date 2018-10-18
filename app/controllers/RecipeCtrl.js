@@ -60,3 +60,18 @@ exports.getOneRecipeHandler = async function(req, res, next) {
 		"time": new Date()
 	})
 };
+
+exports.searchRecipeByText = async function(req ,res, next) {
+	let searchText = req.query.search;
+
+	let [err, recipeDocList] = await to (RecipeSchema.searchRecipeByText(searchText));
+	if(err) throw err;
+
+	res.json({
+		"success": true,
+		"code": 200,
+		"message": "레시피 찾기 완료",
+		"data": recipeDocList,
+		"time": new Date()
+	})
+};

@@ -17,4 +17,7 @@ router.delete('/:recipeId', wrap(RecipeCtrl.removeRecipeHandler));
 /* recipeId에 맞는 레시피의 정보 응답 API */
 router.get('/:recipeId', wrap(RecipeCtrl.getOneRecipeHandler));
 
+/* 쿼리(type => search)에 맞는 레시피 리스트 응답 API */
+router.get('/', wrap(RecipeCtrl.searchRecipeByText));
+
 module.exports = router;

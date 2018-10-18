@@ -71,8 +71,6 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 			if(err) { reject(err); Task.save(err); return ;}
 			if(IngredientTagDoc === null) {
 				IngredientTagDoc = new IngredientTagSchema({ ingredient: ingredient});
-				console.log(IngredientTagDoc);
-
 				IngredientTagDoc.RecipeList.push(recipeDoc._id);
 				Task = Task.save('IngredientTag', IngredientTagDoc);
 			} else {
@@ -141,6 +139,24 @@ recipeSchema.statics.getOneRecipeById = function(recipeId) {
 
 		resolve(recipeDoc);
 	}.bind(this));
+};
+
+recipeSchema.statics.searchRecipeByText = function(text) {
+	return new Promise(async function (resolve, reject) {
+		let [err, recipeDocList] = await to(this.find({
+			title: new RegExp('[a-z 0-9 A-Z 가-힣 ]*'+text+'[a-z 0-9 A-Z 가-힣]*', "i")
+		}, 'title like ingredientList thumbnail').exec());
+		if(err) {
+			err.myMessage = "서버에 오류가 발생하였습니다."; reject(err);
+		}
+
+		if(recipeDocList === null) {
+			resolve("레시피를 찾을 수 없습니다.");
+		} else {
+			resolve(recipeDocList);
+		}
+
+	}.bind(this))
 };
 
 module.exports = mongoClient.model('Recipe', recipeSchema);
