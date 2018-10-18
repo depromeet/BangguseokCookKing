@@ -1,7 +1,8 @@
 'use strict';
 
 const mongoClient = require('mongoose');
-const subRecipeSchema = require('./subRecipeSchema');
+const SubRecipeSchema = require('./SubRecipeSchema');
+const IngredientTagSchema = require('./IngredientTagSchema');
 const to = require('await-to-js').default;
 // error
 const ClientError = require('../helpers/errors/ClientError');
@@ -16,8 +17,12 @@ const recipeSchema = mongoClient.Schema({
 		required: true,
 		default: 0
 	},                      // TODO: 댓글 모델 리스트
-	ingredientList: [{      // 재료 리스트
+	ingredientList: [{      // 재료 문자열(재료 + 계량) 리스트
 		type: String,
+	}],
+	ingredientTagList: [{   // 재료 태그(스키마) 리스트
+		type: mongoClient.Schema.ObjectId,
+		ref: "IngredientTag"
 	}],
 	thumbnail: {            // 썸네일 상대 경로
 		type: String,
@@ -32,13 +37,15 @@ const recipeSchema = mongoClient.Schema({
 });
 
 recipeSchema.statics.createRecipe = function(recipeObj) {
+	// TODO: 좀 더 깔끔히 할 것
 	return new Promise(async function(resolve, reject) {
 		let Task = require('../helpers/fawnHandler').Task();
 		let subRecipeList = [];
+		let IngredientTagList = [];
 
 		// subRecipe 생성
-		for(var i = 0; i < recipeObj.subRecipeList.length; i++){
-			let subRecipeDoc = new subRecipeSchema({
+		for(let i = 0; i < recipeObj.subRecipeList.length; i++){
+			let subRecipeDoc = new SubRecipeSchema({
 				order: i + 1,
 				thumbnail: recipeObj.subRecipeList[i].thumbnail,
 				comment:  recipeObj.subRecipeList[i].comment
@@ -54,6 +61,30 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 			thumbnail: recipeObj.thumbnail,
 			subRecipeList: subRecipeList
 		});
+
+
+		// IngredientTag 생성 혹은 업데이트
+		for(let i = 0; i < recipeObj.ingredientList.length; i++){
+			let ingredient = recipeObj.ingredientList[i].split(' ')[0];
+
+			let [err, IngredientTagDoc] = await to(IngredientTagSchema.findOne({ingredient:ingredient}).exec());
+			if(err) { reject(err); Task.save(err); return ;}
+			if(IngredientTagDoc === null) {
+				IngredientTagDoc = new IngredientTagSchema({ ingredient: ingredient});
+				console.log(IngredientTagDoc);
+
+				IngredientTagDoc.RecipeList.push(recipeDoc._id);
+				Task = Task.save('IngredientTag', IngredientTagDoc);
+			} else {
+				Task = Task.update('IngredientTag', {ingredient: ingredient}, {$push: {RecipeList: recipeDoc._id}});
+			}
+
+			IngredientTagList.push(IngredientTagDoc._id);
+		}
+
+		for(let i = 0; i < IngredientTagList.length; i++){
+			recipeDoc.ingredientTagList.push(IngredientTagList[i]);
+		}
 
 		let [err, taskDone] = await to(Task.save('Recipe', recipeDoc).run({useMongoose: true}));
 		if(err) {
@@ -77,7 +108,13 @@ recipeSchema.statics.removeRecipeCascade = function (recipeId) {
 		// Recipe에 연관된 subRecipe 삭제
 		for(let i = 0; i < recipeDoc.subRecipeList.length; i++) {
 			let subRecipeId = recipeDoc.subRecipeList[i].toString();
-			await subRecipeSchema.findByIdAndRemove(subRecipeId);
+			await SubRecipeSchema.findByIdAndRemove(subRecipeId);
+		}
+
+		// Recipe에 연관된 ingredientTagList 삭제
+		for(let i = 0; i < recipeDoc.ingredientTagList.length; i++) {
+			let ingredientTagId = recipeDoc.ingredientTagList[i].toString();
+			await IngredientTagSchema.findByIdAndRemove(ingredientTagId);
 		}
 
 		await recipeDoc.remove();
