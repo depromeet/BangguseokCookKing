@@ -1,6 +1,6 @@
 {
 	"apps": [{
-	"name": "myExpressGenerator",
+	"name": "BangguseokCookKing",
 	"script": "bin/www",
 	"watch": false,
 	"env": {
