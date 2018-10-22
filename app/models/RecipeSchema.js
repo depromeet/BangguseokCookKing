@@ -20,7 +20,17 @@ const recipeSchema = mongoClient.Schema({
 		type: Number,
 		required: true,
 		default: 0
-	},                      // TODO: 댓글 모델 리스트
+	},
+	comment: {
+		type: Number,
+		required: true,
+		default: 0
+	},
+	level: {
+		type: Number,
+		required: true,
+		default: 1
+	},
 	ingredientList: [{      // 재료 문자열(재료 + 계량) 리스트
 		type: String,
 	}],
@@ -52,7 +62,7 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 			let subRecipeDoc = new SubRecipeSchema({
 				order: i + 1,
 				thumbnail: recipeObj.subRecipeList[i].thumbnail,
-				comment:  recipeObj.subRecipeList[i].comment
+				explain:  recipeObj.subRecipeList[i].explain
 			});
 			subRecipeList.push(subRecipeDoc);
 
@@ -64,7 +74,8 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 			author: recipeObj.author,
 			ingredientList: recipeObj.ingredientList,
 			thumbnail: recipeObj.thumbnail,
-			subRecipeList: subRecipeList
+			subRecipeList: subRecipeList,
+			level: recipeObj.level
 		});
 
 
@@ -133,7 +144,7 @@ recipeSchema.statics.getOneRecipeById = function(recipeId) {
 		let [err, recipeDoc] = await to(this.findById(recipeId, '-ingredientTagList -__v')
 			.populate({
 				path: 'subRecipeList',
-				select: '+order +thumbnail +comment -_id -__v',
+				select: '+order +thumbnail +explain -_id -__v',
 				options: {
 					sort: { order: 1}
 				}
@@ -153,7 +164,7 @@ recipeSchema.statics.searchRecipeByText = function(text) {
 		let [err, recipeDocList] = await to(this.find({
 			title: new RegExp('[a-z 0-9 A-Z 가-힣 ]*'+text+'[a-z 0-9 A-Z 가-힣]*', "i")
 			},
-			'+title +_id +author +like +ingredientList +thumbnail -ingredientTagList -subRecipeList'
+			'+title +level +comment +_id +author +like +ingredientList +thumbnail -ingredientTagList -subRecipeList'
 			,{
 				sort:{
 					like: -1 //Sort by Date Added DESC

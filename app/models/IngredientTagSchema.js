@@ -34,7 +34,7 @@ IngredientTagSchema.statics.searchRecipeByTag = function(ingredient) {
 		let [err, IngredientTagDoc] = await to(this.findOne({ingredient: ingredient})
 			.populate({
 				path: 'RecipeList',
-				select: '+title +_id +author +like +ingredientList +thumbnail -ingredientTagList -subRecipeList',
+				select: '+title +level +comment +_id +author +like +ingredientList +thumbnail -ingredientTagList -subRecipeList',
 				options: {
 					sort: { like: -1}
 				}

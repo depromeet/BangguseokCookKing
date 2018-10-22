@@ -8,7 +8,7 @@ const subRecipeSchema = mongoClient.Schema({
 		type: String,
 		default: null
 	},
-	comment: {
+	explain: {
 		type: String,
 		required: true
 	}

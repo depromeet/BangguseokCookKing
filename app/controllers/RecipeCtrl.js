@@ -17,7 +17,8 @@ exports.createRecipeHandler = async(req, res, next) => {
 			author: config.username[Math.floor(Math.random() * config.username.length)],
 			ingredientList: ingredientList_,
 			thumbnail: req.files.recipe[0].path.substr(6),
-			subRecipeList: subRecipeList_
+			subRecipeList: subRecipeList_,
+			level: parseInt(req.body.level)
 		};
 		// subRecipeList 마다 thumbnail field 추가.
 		for(let i = 0; i < subRecipeList_.length; i++)
