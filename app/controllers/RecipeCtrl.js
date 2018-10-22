@@ -5,14 +5,20 @@ const to = require('await-to-js').default;
 
 exports.createRecipeHandler = async(req, res, next) => {
 	let recipeData;
+	let subRecipeList_ = JSON.parse(req.body.subRecipeList);
+	let ingredientList_ = JSON.parse(req.body.ingredientList);
+
 	try {
 		recipeData = {
 			title: req.body.title,
 			//author: "김민호",
-			ingredientList: JSON.parse(req.body.ingredientList),
+			ingredientList: ingredientList_,
 			thumbnail: req.files.recipe[0].path.substr(6),
-			subRecipeList: JSON.parse(req.body.subRecipeList)
+			subRecipeList: subRecipeList_
 		};
+		// subRecipeList 마다 thumbnail field 추가.
+		for(let i = 0; i < subRecipeList_.length; i++)
+			recipeData.subRecipeList[i].thumbnail = req.files.subRecipe[i].path.substr(6);
 	} catch (err) {
 		err.myMessage = "잘못된 json 데이터입니다."; throw err;
 	}
