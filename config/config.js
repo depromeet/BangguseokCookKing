@@ -9,6 +9,7 @@
 	}
 });
 const config = {};
+config.username = ["홍길동", "홍길순", "올라 노르만", "금난새", "김나리"];
 
 if(process.env.NODE_ENV === "dev") {
 	config.mongodb = {
