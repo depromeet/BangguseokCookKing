@@ -34,18 +34,15 @@ IngredientTagSchema.statics.searchRecipeByTag = function(ingredient) {
 		let [err, IngredientTagDoc] = await to(this.findOne({ingredient: ingredient})
 			.populate({
 				path: 'RecipeList',
-				select: 'title like ingredientList thumbnail subRecipeList -_id',
-				populate: {
-					path: 'subRecipeList',
-					select: 'order thumbnail comment -_id',
-					options: {
-						sort: { order: 1}
-					}
+				select: '+title +_id +author +like +ingredientList +thumbnail -ingredientTagList -subRecipeList',
+				options: {
+					sort: { like: -1}
 				}
 			})
 			.exec());
+		debugger;
 		if(err) reject(err);
-		if(IngredientTagDoc === null) {reject(new ClientError("잘못된 재료를 검색하였습니다.", 400, Date.now())); return ;}
+		if(IngredientTagDoc === undefined || IngredientTagDoc === null) {reject(new ClientError("잘못된 재료를 검색하였습니다.", 400, Date.now())); return ;}
 
 		resolve(IngredientTagDoc.RecipeList);
 	}.bind(this))

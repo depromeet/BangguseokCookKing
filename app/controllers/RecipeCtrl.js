@@ -2,6 +2,7 @@
 
 const RecipeSchema = require('../models/RecipeSchema');
 const to = require('await-to-js').default;
+const config = require('../../config/config');
 
 exports.createRecipeHandler = async(req, res, next) => {
 	let recipeData;
@@ -11,7 +12,7 @@ exports.createRecipeHandler = async(req, res, next) => {
 	try {
 		recipeData = {
 			title: req.body.title,
-			//author: "김민호",
+			author: config.username[Math.random() * config.username.length],
 			ingredientList: ingredientList_,
 			thumbnail: req.files.recipe[0].path.substr(6),
 			subRecipeList: subRecipeList_

@@ -11,7 +11,11 @@ const recipeSchema = mongoClient.Schema({
 	title: {                // 요리 제목
 		type: String,
 		required: true
-	},                      // TODO: 작성자 ID
+	},
+	author: {
+		type: String,
+		required: true
+	},
 	like: {
 		type: Number,
 		required: true,
@@ -123,10 +127,10 @@ recipeSchema.statics.removeRecipeCascade = function (recipeId) {
 
 recipeSchema.statics.getOneRecipeById = function(recipeId) {
 	return new Promise(async function(resolve, reject) {
-		let [err, recipeDoc] = await to(this.findById(recipeId)
+		let [err, recipeDoc] = await to(this.findById(recipeId, '-ingredientTagList -__v')
 			.populate({
 				path: 'subRecipeList',
-				select: 'order thumbnail comment',
+				select: '+order +thumbnail +comment -_id -__v',
 				options: {
 					sort: { order: 1}
 				}
@@ -145,7 +149,13 @@ recipeSchema.statics.searchRecipeByText = function(text) {
 	return new Promise(async function (resolve, reject) {
 		let [err, recipeDocList] = await to(this.find({
 			title: new RegExp('[a-z 0-9 A-Z 가-힣 ]*'+text+'[a-z 0-9 A-Z 가-힣]*', "i")
-		}, 'title like ingredientList thumbnail').exec());
+			},
+			'+title +_id +author +like +ingredientList +thumbnail -ingredientTagList -subRecipeList'
+			,{
+				sort:{
+					like: -1 //Sort by Date Added DESC
+				}
+			}).exec());
 		if(err) {
 			err.myMessage = "서버에 오류가 발생하였습니다."; reject(err);
 		}
