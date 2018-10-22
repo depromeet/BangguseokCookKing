@@ -17,7 +17,7 @@ if(process.env.NODE_ENV === "dev") {
 		"HOST": 'localhost'
 	};
 	config.server = {
-		PORT: 80
+		PORT: 3000
 	}
 } else if(process.env.NODE_ENV === "prod") {
 	config.mongodb = {
