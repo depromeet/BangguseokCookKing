@@ -3,9 +3,14 @@ const mongoError = require('./MongoError');
 
 module.exports = function (err, req, res, next) {
     // TODO: 에러 내용 로그에 출력
-
     if(err instanceof mongoError) {
-        // TODO: 데이터베이스 에러
+        console.error(err);
+        res.json({
+            "success": false,
+            "code": err.status,
+            "message": err.myMessage,
+            "time": Date.now()
+        })
     } else {
         // set locals, only providing error in development
         res.locals.message = err.message;

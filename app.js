@@ -7,6 +7,7 @@ const errorHandle = require('./app/helpers/errors/errorHandle');
 
 const indexRouter = require('./app/routes/index');
 const RecipeRouter = require('./app/routes/RecipeRouter');
+const IngredientTagRouter = require('./app/routes/IngredientTagRouter');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use((req, res, next) => {
 
 app.use('/', indexRouter);
 app.use('/recipe', RecipeRouter);
+app.use('/ingredient', IngredientTagRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -4,24 +4,21 @@ const RecipeSchema = require('../models/RecipeSchema');
 const to = require('await-to-js').default;
 
 exports.createRecipeHandler = async(req, res, next) => {
-	// TODO: 데이터 형식 정해야함
-	let recipeData = {
-		title: "계란찜",
-		ingredientList: ["계란 3알", "물 반컵"],
-		thumbnail: req.files.recipe[0].path.substr(6),
-		subRecipeList: [{
-			order: 1,
-			thumbnail: "/test1",
-			comment:  "test 코멘트"
-		}, {
-			order: 2,
-			thumbnail: "/test2",
-			comment:  "test 코멘트2"
-		}]
-	};
+	let recipeData;
+	try {
+		recipeData = {
+			title: req.body.title,
+			//author: "김민호",
+			ingredientList: JSON.parse(req.body.ingredientList),
+			thumbnail: req.files.recipe[0].path.substr(6),
+			subRecipeList: JSON.parse(req.body.subRecipeList)
+		};
+	} catch (err) {
+		err.myMessage = "잘못된 json 데이터입니다."; throw err;
+	}
 
 	let [err, recipeDoc] = await to(RecipeSchema.createRecipe(recipeData));
-	if(err) throw err;
+	if(err) {logger.error(err); throw err; }
 
 	res.json({
 		"success": true,
