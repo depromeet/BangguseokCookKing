@@ -61,6 +61,7 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 
 		let recipeDoc = new this({
 			title: recipeObj.title,
+			author: recipeObj.author,
 			ingredientList: recipeObj.ingredientList,
 			thumbnail: recipeObj.thumbnail,
 			subRecipeList: subRecipeList
@@ -73,6 +74,7 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 
 			let [err, IngredientTagDoc] = await to(IngredientTagSchema.findOne({ingredient:ingredient}).exec());
 			if(err) { reject(err); Task.save(err); return ;}
+
 			if(IngredientTagDoc === null) {
 				IngredientTagDoc = new IngredientTagSchema({ ingredient: ingredient});
 				IngredientTagDoc.RecipeList.push(recipeDoc._id);
@@ -85,8 +87,9 @@ recipeSchema.statics.createRecipe = function(recipeObj) {
 		}
 
 		for(let i = 0; i < IngredientTagList.length; i++){
-			recipeDoc.ingredientTagList.push(IngredientTagList[i]);
+			recipeDoc.ingredientTagList.push(IngredientTagList[i]._id);
 		}
+		debugger;
 
 		let [err, taskDone] = await to(Task.save('Recipe', recipeDoc).run({useMongoose: true}));
 		if(err) {

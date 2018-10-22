@@ -10,9 +10,11 @@ exports.createRecipeHandler = async(req, res, next) => {
 	let ingredientList_ = JSON.parse(req.body.ingredientList);
 
 	try {
+		console.log(config.username);
+		console.log(config.username[Math.floor(Math.random() * config.username.length)]);
 		recipeData = {
 			title: req.body.title,
-			author: config.username[Math.random() * config.username.length],
+			author: config.username[Math.floor(Math.random() * config.username.length)],
 			ingredientList: ingredientList_,
 			thumbnail: req.files.recipe[0].path.substr(6),
 			subRecipeList: subRecipeList_

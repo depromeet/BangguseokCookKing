@@ -1,9 +1,10 @@
 'use strict';
 const mongoError = require('./MongoError');
+const ClientError = require('./ClientError');
 
 module.exports = function (err, req, res, next) {
     // TODO: 에러 내용 로그에 출력
-    if(err instanceof mongoError) {
+    if(err instanceof mongoError || err instanceof ClientError) {
         console.error(err);
         res.json({
             "success": false,
