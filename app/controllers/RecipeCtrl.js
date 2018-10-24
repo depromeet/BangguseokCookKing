@@ -11,7 +11,7 @@ exports.createRecipeHandler = async(req, res, next) => {
 		let subRecipeList_ = JSON.parse(req.body.subRecipeList);
 		let ingredientList_ = JSON.parse(req.body.ingredientList);
 
-		logger.log("유저 이름: " + config.username);
+		logger.info("유저 이름: " + config.username);
 		recipeData = {
 			title: req.body.title,
 			author: config.username[Math.floor(Math.random() * config.username.length)],
