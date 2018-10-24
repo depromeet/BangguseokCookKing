@@ -1,4 +1,5 @@
 const mongoClient = require('mongoose');
+const config = require('../../config/config');
 const subRecipeSchema = mongoClient.Schema({
 	order: {    // 순서
 		type: Number,
@@ -6,7 +7,7 @@ const subRecipeSchema = mongoClient.Schema({
 	},
 	thumbnail: {
 		type: String,
-		default: null
+		default: config.DEFAULT_IMG_PATH
 	},
 	explain: {
 		type: String,

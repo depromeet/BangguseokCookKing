@@ -6,12 +6,12 @@ const config = require('../../config/config');
 
 exports.createRecipeHandler = async(req, res, next) => {
 	let recipeData;
-	let subRecipeList_ = JSON.parse(req.body.subRecipeList);
-	let ingredientList_ = JSON.parse(req.body.ingredientList);
 
 	try {
-		console.log(config.username);
-		console.log(config.username[Math.floor(Math.random() * config.username.length)]);
+		let subRecipeList_ = JSON.parse(req.body.subRecipeList);
+		let ingredientList_ = JSON.parse(req.body.ingredientList);
+
+		logger.log("유저 이름: " + config.username);
 		recipeData = {
 			title: req.body.title,
 			author: config.username[Math.floor(Math.random() * config.username.length)],
@@ -20,9 +20,12 @@ exports.createRecipeHandler = async(req, res, next) => {
 			subRecipeList: subRecipeList_,
 			level: parseInt(req.body.level)
 		};
+
 		// subRecipeList 마다 thumbnail field 추가.
-		for(let i = 0; i < subRecipeList_.length; i++)
+		for(let i = 0; i < req.files.subRecipe.length; i++){
 			recipeData.subRecipeList[i].thumbnail = req.files.subRecipe[i].path.substr(6);
+		}
+		console.log("recipeData: ", recipeData);
 	} catch (err) {
 		err.myMessage = "잘못된 json 데이터입니다."; throw err;
 	}
